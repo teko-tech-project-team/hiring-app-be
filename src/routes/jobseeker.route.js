@@ -5,6 +5,7 @@ const jobseekerController = require("../controllers/jobseeker.controller");
 const formUpload = require("../../helper/formUpload");
 
 // Endpoint profile
+router.get("/", jobseekerController.getAllJobseeker);
 router.get("/:id", jobseekerController.getById);
 router.patch(
   "/:id",
