@@ -7,7 +7,7 @@ const jobseekerModel = {
   getById: (id) => {
     return new Promise((success, failed) => {
       db.query(
-        `SELECT fullname,email,phone_number,profile_image, profession,job_time, description,domicile,instagram,github,gitlab,skills,json_agg(row_to_json(e)) experience FROM jobseeker INNER JOIN job_experience AS e ON e.id_jobseeker=$1 GROUP BY id`,
+        `SELECT fullname,email,phone_number,profile_image, profession,job_time, description,domicile,instagram,github,gitlab,skills,json_agg(row_to_json(e)) experience FROM jobseeker INNER JOIN job_experience AS e ON e.id_jobseeker=$1 AND id=$1 GROUP BY id`,
         [id],
         (error, result) => {
           if (error) return failed("Id not found! Please check your id again!");
@@ -36,14 +36,16 @@ const jobseekerModel = {
     gitlab,
     description,
     profile_image,
+    skills,
   }) => {
+    console.log(profile_image);
     return new Promise((success, failed) => {
       db.query(`SELECT * FROM jobseeker WHERE id=$1`, [id], (error, result) => {
         if (error) return failed(error.message);
         if (result.rows.length === 0)
           return failed("Id not found! Please check your id again!");
         db.query(
-          `UPDATE jobseeker SET fullname=$1,profession=$2,domicile=$3,instagram=$4,github=$5,gitlab=$6,description=$7,profile_image=$8 WHERE id=$9`,
+          `UPDATE jobseeker SET fullname=$1,profession=$2,domicile=$3,instagram=$4,github=$5,gitlab=$6,description=$7,profile_image=$8,skills=$9 WHERE id=$10`,
           [
             fullname || result.rows[0].fullname,
             profession || result.rows[0].profession,
@@ -52,7 +54,14 @@ const jobseekerModel = {
             github || result.rows[0].github,
             gitlab || result.rows[0].gitlab,
             description || result.rows[0].description,
-            profile_image || result.rows[0].profile_image,
+            profile_image
+              ? profile_image.filename
+              : result.rows[0].profile_image,
+            `{${
+              skills
+                ? [...result.rows[0].skills, skills]
+                : result.rows[0].skills
+            }}`,
             id,
           ],
           (err) => {
@@ -89,6 +98,20 @@ const jobseekerModel = {
         (error) => {
           if (error) return failed(error.message);
           return success("Successfully added to database!");
+        }
+      );
+    });
+  },
+  getAllExperience: (id) => {
+    return new Promise((success, failed) => {
+      db.query(
+        `SELECT * FROM job_experience WHERE id_jobseeker=$1`,
+        [id],
+        (error, result) => {
+          if (error) return failed(error.message);
+          if (result.rows.length === 0)
+            return failed("Id not found! Please check your id again!");
+          return success(result.rows);
         }
       );
     });
@@ -175,6 +198,19 @@ const jobseekerModel = {
               }
             );
           }
+        }
+      );
+    });
+  },
+  getAllPortfolio: (id) => {
+    return new Promise((success, failed) => {
+      db.query(
+        `SELECT p.app_name,p.repository,json_agg(json_build_object('alt', pi.name, 'filename', pi.filename)) portfolio_image FROM portfolio AS p INNER JOIN portfolio_images AS pi ON p.id_jobseeker=$1 AND p.id_app=pi.id_app GROUP BY p.id_app`,
+        [id],
+        (error, result) => {
+          if (error) return failed(error.message);
+          if (result.rows.length === 0) return failed("Portfolio not found");
+          return success(result.rows);
         }
       );
     });
@@ -284,6 +320,23 @@ const jobseekerModel = {
       );
     });
   },
+  // toArrayQuery: (array) => {
+  //   if (array != undefined && array.length > 1) {
+  //     let newArray = [];
+  //     for (let i = 0; i < array.length; i++) {
+  //       newArray.push(`${array[i]}`);
+  //     }
+  //     const result = `{ ${
+  //       newArray.length == 1 ? newArray : newArray.join(",")
+  //     } }`;
+  //     return result;
+  //   } else if (array != undefined && array.length == 1) {
+  //     const result = `{ ${newArray} }`;
+  //     return result;
+  //   } else {
+  //     return;
+  //   }
+  // },
   // End Portfolio
 };
 
