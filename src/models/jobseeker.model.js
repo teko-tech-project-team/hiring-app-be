@@ -3,6 +3,14 @@ const db = require("../../helper/db.connect");
 const { v4: uuidv4 } = require("uuid");
 
 const jobseekerModel = {
+  getAllJobseeker: () => {
+    return new Promise((success, failed) => {
+      db.query(`SELECT * FROM jobseeker`, (error, result) => {
+        if (error) return failed(error.message);
+        return success(result.rows);
+      });
+    });
+  },
   // Profile
   getById: (id) => {
     return new Promise((success, failed) => {
@@ -57,11 +65,13 @@ const jobseekerModel = {
             profile_image
               ? profile_image.filename
               : result.rows[0].profile_image,
-            `{${
-              skills
-                ? [...result.rows[0].skills, skills]
-                : result.rows[0].skills
-            }}`,
+            skills
+              ? `{${
+                  result.rows[0].skills != null
+                    ? [...result.rows[0].skills, skills]
+                    : skills
+                }}`
+              : result.rows[0].skills,
             id,
           ],
           (err) => {
