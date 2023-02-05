@@ -60,6 +60,14 @@ const jobseekerController = {
         });
       });
   },
+  getAllExperience: (req, res) => {
+    return jobseekerModel.getAllExperience(req.params.id).then((result) => {
+      return res.status(200).send({
+        Message: "Success request to server! fetch successfully!",
+        Data: result,
+      });
+    });
+  },
   getExperience: (req, res) => {
     return jobseekerModel
       .getExperience(req.params.id)
@@ -133,6 +141,23 @@ const jobseekerController = {
         return res.status(400).send({
           Message: "Succes request to server! failed add data!",
           Data: error,
+        });
+      });
+  },
+  getAllPortfolio: (req, res) => {
+    return jobseekerModel
+      .getAllPortfolio(req.params.id)
+      .then((result) => {
+        return res.status(200).send({
+          Message: "Success request to server!",
+          Data: result,
+        });
+      })
+      .catch((error) => {
+        return res.status(400).send({
+          Message: "Succes request to server! fetch failed!",
+          Error: error,
+          Data: [],
         });
       });
   },
