@@ -2,6 +2,14 @@
 const jobseekerModel = require("../models/jobseeker.model");
 
 const jobseekerController = {
+  getAllJobseeker: (req, res) => {
+    return jobseekerModel.getAllJobseeker().then((result) => {
+      return res.status(200).send({
+        Message: "Success request to server!",
+        Data: result,
+      });
+    });
+  },
   // Profile
   getById: (req, res) => {
     return jobseekerModel
@@ -61,12 +69,21 @@ const jobseekerController = {
       });
   },
   getAllExperience: (req, res) => {
-    return jobseekerModel.getAllExperience(req.params.id).then((result) => {
-      return res.status(200).send({
-        Message: "Success request to server! fetch successfully!",
-        Data: result,
+    return jobseekerModel
+      .getAllExperience(req.params.id)
+      .then((result) => {
+        return res.status(200).send({
+          Message: "Success request to server! fetch successfully!",
+          Data: result,
+        });
+      })
+      .catch((error) => {
+        return res.status(400).send({
+          Message: "Succes request to server! fetch failed!",
+          Error: error,
+          Data: [],
+        });
       });
-    });
   },
   getExperience: (req, res) => {
     return jobseekerModel
