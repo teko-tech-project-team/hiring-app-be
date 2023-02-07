@@ -15,12 +15,13 @@ const jobseekerModel = {
   getById: (id) => {
     return new Promise((success, failed) => {
       db.query(
-        `SELECT fullname,email,phone_number,profile_image, profession,job_time, description,domicile,instagram,github,gitlab,skills,json_agg(row_to_json(e)) experience FROM jobseeker INNER JOIN job_experience AS e ON e.id_jobseeker=$1 AND id=$1 GROUP BY id`,
+        `SELECT fullname,email,phone_number,profile_image, profession,job_time, description,domicile,instagram,github,gitlab,skills,json_agg(row_to_json(e)) experience FROM jobseeker INNER JOIN job_experience AS e ON id=$1 AND e.id_jobseeker=$1 GROUP BY id`,
         [id],
         (error, result) => {
+          // console.log(result.rows);
           if (error) return failed("Id not found! Please check your id again!");
           if (result.rows.length === 0)
-            return failed("Id not found! Please check your id again!");
+            return failed("Id not found! Please check your id again! Test 2");
           // return success(result.rows);
           db.query(
             `SELECT p.id_app,p.id_jobseeker,p.app_name,p.repository,json_agg(row_to_json(pi)) portfolio_image FROM portfolio AS p INNER JOIN portfolio_images AS pi ON id_jobseeker=$1 AND p.id_app=pi.id_app GROUP BY p.id_app`,
