@@ -6,7 +6,7 @@ const jwt = require("jsonwebtoken");
 
 const authJobSeekerController = {
   login: (req, res) => {
-    console.log(req.body);
+    // console.log(req.body);
     return authJobseekerModel
       .login(req.body)
       .then((result) => {

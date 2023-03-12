@@ -4,7 +4,7 @@ const bcrypt = require("bcrypt");
 
 const authJobseekerModel = {
   login: ({ email, password }) => {
-    console.log(email, password);
+    // console.log(email, password);
     return new Promise((success, failed) => {
       db.query(
         `SELECT * FROM jobseeker WHERE email=$1`,

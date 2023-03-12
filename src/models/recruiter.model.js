@@ -11,7 +11,7 @@ const recruiterModel = {
           if (err) {
             return reject(err.message);
           } else {
-            console.log(id);
+            // console.log(id);
             return resolve(result.rows);
           }
         }
@@ -57,18 +57,20 @@ const recruiterModel = {
               if (err) {
                 return reject(err.message);
               } else {
-                db.query(
-                  "UPDATE tb_auth_recruiter SET image=$1 WHERE id=$2",
-                  [
-                    profile_image
-                      ? profile_image.filename
-                      : result.rows[0].profile_image,
-                    id,
-                  ],
-                  (error) => {
-                    if (error) return reject(error.message);
-                  }
-                );
+                if (profile_image) {
+                  db.query(
+                    "UPDATE tb_auth_recruiter SET image=$1 WHERE id=$2",
+                    [
+                      profile_image
+                        ? profile_image.filename
+                        : result.rows[0].profile_image,
+                      id,
+                    ],
+                    (error) => {
+                      if (error) return reject(error.message);
+                    }
+                  );
+                }
                 return resolve({
                   id,
                   profile_image,

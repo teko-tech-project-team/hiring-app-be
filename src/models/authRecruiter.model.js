@@ -40,7 +40,7 @@ const authModel = {
           if (err) {
             return reject(err.message);
           } else {
-            console.log(result.rows[0].id);
+            // console.log(result.rows[0].id);
             db.query(
               `INSERT INTO tb_recruiter (id, name, email, company_name, sector, phone) VALUES ($1, $2, $3, $4, $5, $6)`,
               [result.rows[0].id, name, email, company_name, sector, phone],
