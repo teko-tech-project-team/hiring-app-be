@@ -44,10 +44,14 @@ const jobseekerController = {
     };
     return jobseekerModel
       .edit(request)
-      .then((result) => {
+      .then(async (result) => {
+        const checkDefault = result.oldImage.includes("default");
+        if (result.oldImage && !checkDefault) {
+          await cloudinary.uploader.destroy(result.oldImage);
+        }
         res.status(200).send({
           Message: "Success request to server! update successfully!",
-          Data: result,
+          Data: "Succes update your profile",
         });
       })
       .catch((error) => {

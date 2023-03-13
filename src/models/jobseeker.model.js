@@ -89,6 +89,9 @@ const jobseekerModel = {
           ],
           (err) => {
             if (err) return failed(err.message);
+            if (profile_image) {
+              return success({ oldImage: result.rows[0].profile_image });
+            }
             return success("Succes update your profile");
           }
         );
