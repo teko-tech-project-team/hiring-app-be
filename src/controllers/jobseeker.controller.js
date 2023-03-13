@@ -1,5 +1,6 @@
 // Imports
 const jobseekerModel = require("../models/jobseeker.model");
+const cloudinary = require("../../helper/cloudinary");
 
 const jobseekerController = {
   getAllJobseeker: (req, res) => {
@@ -28,10 +29,17 @@ const jobseekerController = {
         });
       });
   },
-  edit: (req, res) => {
+  edit: async (req, res) => {
+    const upload = req.file
+      ? await cloudinary.uploader.upload(req.file.path, {
+          folder: "hiring_app",
+          format: "webp",
+          public_id: `profile-${new Date().getTime()}`,
+        })
+      : undefined;
     const request = {
       ...req.body,
-      profile_image: req.file,
+      profile_image: upload,
       id: req.params.id,
     };
     return jobseekerModel
@@ -141,25 +149,44 @@ const jobseekerController = {
   // End Experience
 
   // Portfolio
-  addPortfolio: (req, res) => {
-    const request = {
-      ...req.body,
-      portfolio_image: req.files,
-    };
-    return jobseekerModel
-      .addPortfolio(request)
-      .then((result) => {
-        res.status(200).send({
-          Message: "Success request to server!",
-          Data: result,
-        });
-      })
-      .catch((error) => {
-        return res.status(400).send({
-          Message: "Succes request to server! failed add data!",
-          Data: error,
-        });
+  addPortfolio: async (req, res) => {
+    if (req.files.length == 0) {
+      return res.send({
+        Message: "Product data must be filled in completely",
       });
+    }
+    let result = [];
+    await req.files.map((item, i) => {
+      cloudinary.uploader
+        .upload(item.path, {
+          folder: "hiring_app",
+          format: "webp",
+          public_id: `portfolio-${new Date().getTime()}`,
+        })
+        .then((uploadResult) => {
+          result.push(uploadResult);
+          if (i == req.files.length - 1) {
+            const request = {
+              ...req.body,
+              portfolio_image: result,
+            };
+            return jobseekerModel
+              .addPortfolio(request)
+              .then((result) => {
+                res.status(200).send({
+                  Message: "Success request to server!",
+                  Data: result,
+                });
+              })
+              .catch((error) => {
+                return res.status(400).send({
+                  Message: "Succes request to server! failed add data!",
+                  Data: error,
+                });
+              });
+          }
+        });
+    });
   },
   getAllPortfolio: (req, res) => {
     return jobseekerModel

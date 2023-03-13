@@ -76,7 +76,7 @@ const jobseekerModel = {
             gitlab || result.rows[0].gitlab,
             description || result.rows[0].description,
             profile_image
-              ? profile_image.filename
+              ? profile_image.public_id
               : result.rows[0].profile_image,
             skills
               ? `{${
@@ -213,7 +213,7 @@ const jobseekerModel = {
                 uuidv4(),
                 result.rows[0].id_app,
                 app_name,
-                portfolio_image[i].filename,
+                portfolio_image[i].public_id,
               ],
               (err) => {
                 if (err) return failed(err.message);

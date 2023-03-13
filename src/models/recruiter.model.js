@@ -40,7 +40,7 @@ const recruiterModel = {
           db.query(
             `UPDATE tb_recruiter SET profile_image='${
               profile_image
-                ? profile_image.filename
+                ? profile_image.public_id
                 : result.rows[0].profile_image
             }', name='${name || result.rows[0].name}', company_name='${
               company_name || result.rows[0].company_name
@@ -53,24 +53,24 @@ const recruiterModel = {
             }', phone='${phone || result.rows[0].phone}', linkedin='${
               linkedin || result.rows[0].linkedin
             }'  WHERE id='${id}'`,
-            (err, result) => {
-              if (err) {
-                return reject(err.message);
+            (error) => {
+              if (error) {
+                return reject(error.message);
               } else {
-                if (profile_image) {
-                  db.query(
-                    "UPDATE tb_auth_recruiter SET image=$1 WHERE id=$2",
-                    [
-                      profile_image
-                        ? profile_image.filename
-                        : result.rows[0].profile_image,
-                      id,
-                    ],
-                    (error) => {
-                      if (error) return reject(error.message);
-                    }
-                  );
-                }
+                // if (profile_image) {
+                //   db.query(
+                //     "UPDATE tb_auth_recruiter SET image=$1 WHERE id=$2",
+                //     [
+                //       profile_image
+                //         ? profile_image.filename
+                //         : result.rows[0].profile_image,
+                //       id,
+                //     ],
+                //     (error) => {
+                //       if (error) return reject(error.message);
+                //     }
+                //   );
+                // }
                 return resolve({
                   id,
                   profile_image,
@@ -83,6 +83,9 @@ const recruiterModel = {
                   instagram,
                   phone,
                   linkedin,
+                  oldImage: profile_image
+                    ? result.rows[0].profile_image
+                    : false,
                 });
               }
             }

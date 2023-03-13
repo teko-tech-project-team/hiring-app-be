@@ -1,5 +1,6 @@
 //import internal
 const recruiterModel = require("../models/recruiter.model");
+const cloudinary = require("../../helper/cloudinary");
 
 const recruiterController = {
   getById: (req, res) => {
@@ -8,15 +9,26 @@ const recruiterController = {
     });
   },
 
-  update: (req, res) => {
+  update: async (req, res) => {
+    const upload = req.file
+      ? await cloudinary.uploader.upload(req.file.path, {
+          folder: "hiring_app",
+          format: "webp",
+          public_id: `profile-${new Date().getTime()}`,
+        })
+      : undefined;
     const request = {
       ...req.body,
-      profile_image: req.file,
+      profile_image: upload,
       id: req.params.id,
     };
     return recruiterModel
       .update(request)
-      .then((result) => {
+      .then(async (result) => {
+        const checkDefault = result.oldImage.includes("default");
+        if (result.oldImage && !checkDefault) {
+          await cloudinary.uploader.destroy(result.oldImage);
+        }
         return res.status(201).send({ message: "succes", data: result });
       })
       .catch((error) => {
